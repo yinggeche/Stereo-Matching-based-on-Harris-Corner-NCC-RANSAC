@@ -1,12 +1,12 @@
 # Steoro-Matching-based-on-Harris-Corner-NCC-RANSAC
-### Find the interesting features and correspondences between the images
+### Step 1: Find the interesting features and correspondences between the images
 1. Get the corner features by using Harris Corner Detection and NCC algorithms
 2. Can also use SIFT features
-### Estimate the Fundamental Matrix
+### Step 2: Estimate the Fundamental Matrix
 1. Use the correspndences above
 2. Use RANSAC to elimate outliners
 3. Remain the inliners' correspondences
-### Compute the dense disparity map
+### Step 3: Compute the dense disparity map
 1. Use the Fundamental matrix
 2. Display the results by three images
 
