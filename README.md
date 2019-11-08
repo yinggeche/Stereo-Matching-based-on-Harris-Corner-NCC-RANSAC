@@ -1,4 +1,4 @@
-# Steoro-Matching-based-on-Harris-Corner-NCC-RANSAC
+# Stereo-Matching-based-on-Harris-Corner-NCC-RANSAC
 ### Step 1: Find the interesting features and correspondences between the images
 1. Get the corner features by using Harris Corner Detection and NCC algorithms
 2. Can also use SIFT features
