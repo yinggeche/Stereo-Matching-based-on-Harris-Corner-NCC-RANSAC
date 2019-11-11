@@ -21,9 +21,10 @@ def harris_corner(filename):
     #   img[dst>0.00000001*dst.max()]=[0,0,255]
     img[dst>0.01*dst.max()]=[0,0,255]
 
-    cv2.imshow('dst',img)
-    if cv2.waitKey(0) & 0xff == 27:
-        cv2.destroyAllWindows()
+    # cv2.imshow('dst',img)
+    return img
+    # if cv2.waitKey(0) & 0xff == 27:
+    #     cv2.destroyAllWindows()
 
 def sift_feature(image):
     """ Find intersting corner features based on SIFT
@@ -45,5 +46,5 @@ if __name__ == "__main__":
     # parser.add_argument('input2',default=None, help='Input the second image')
     # args = parser.parse_args()
 
-    harris_corner("cast-left.jpg");
-    harris_corner("cast-right.jpg");
+    cv2.imwrite("left_corner.jpg",harris_corner("cast-left.jpg"));
+    cv2.imwrite("right_corner.jpg",harris_corner("cast-right.jpg"));
