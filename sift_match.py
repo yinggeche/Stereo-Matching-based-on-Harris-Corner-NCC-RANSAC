@@ -2,6 +2,11 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 def sift_match(img1,img2):
+    ''' Given two images, get the sift features and descriptors
+        Compute the correspondences between features by Knn
+        Set a threshold and get the good correspondences
+        Draw the lines representing good matches
+    '''
     # Initiate SIFT detector
     sift = cv2.xfeatures2d.SIFT_create()
 
@@ -32,8 +37,25 @@ def sift_match(img1,img2):
     cv2.imwrite("result/SIFT_matching_result.png", img3)
     return good, pts1, pts2
 
+def draw_matches(img1, img2, pts1, pts2):
+    # Get the size of Images
+    h1, w1 = img1.shape
+    h2, w2 = img2.shape
+    # Create a canvas to draw matches
+    canvas = np.ones(max(h1, h2), w1+w2+100)*255
+    # Draw the two pictures in the canvas
+
+    print(img1.shape)
+    print(img2.shape)
+    print(pts1)
+
+
 def find_fundamental(matches, pts1, pts2):
-    #pass
+    ''' Given the good matches and two images
+        Compute the Fundamental Matrix by RANSAC
+        Draw the inliners correspondences
+        Store the F matrix into a file
+    '''
     minNumber = 8
     if len(matches) < minNumber:
         return ArgumentDefaultsHelpFormatter
@@ -45,13 +67,15 @@ def find_fundamental(matches, pts1, pts2):
     # If the points are inliners, the mask is 1
     pts1 = pts1[mask.ravel() == 1]
     pts2 = pts2[mask.ravel() == 1]
+    # img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags = 2)
+    # cv2.imwrite("result/RANSAC_inliners_matching.png", img3)
     F2, mask = cv2.findFundamentalMat(pts1,pts2,cv2.FM_RANSAC)
     file=open('result/FundamentalMat.txt','w')
     file.write(str(F2))
     file.close()
     return F2, pts1, pts2
 
-def drawlines(img1,img2,lines,pts1,pts2):
+def draw_lines(img1,img2,lines,pts1,pts2):
     ''' img1 - image on which we draw the epilines for the points in img2
         lines - corresponding epilines '''
     r,c = img1.shape
@@ -67,11 +91,15 @@ def drawlines(img1,img2,lines,pts1,pts2):
     return img1
 
 def get_disparity(img1, img2):
+    """ Compute the disparity map by Semi-Global Block Matching
+        First compute the Horizontal and Vertical graident
+        And filter the gradient to get the disparity
+    """
     stereo = cv2.StereoSGBM_create(numDisparities=32, blockSize=15, P1 = 8*3*3**2, P2 = 64*3*3**2, disp12MaxDiff = 1, uniquenessRatio = 10, speckleWindowSize = 100, speckleRange = 32)
     disparity = stereo.compute(img1,img2).astype(np.float32)
     # Normalize the disparity map into 0-255
     min_val, max_val, min_idx, max_idx = cv2.minMaxLoc(disparity)
-    cv2.imwrite("result/disparity_window_15.png", disparity*(255/max_val))
+    cv2.imwrite("result/disparity.png", disparity*(255/max_val))
 
 if __name__ == '__main__':
     # Load images
@@ -83,16 +111,17 @@ if __name__ == '__main__':
     good, pts1, pts2 = sift_match(img1,img2)
     # Get Fundamental Matrix
     F, pts1, pts2 = find_fundamental(good, pts1, pts2)
+    # Display the inlier correspondences
+    draw_matches(img1, img2, pts1, pts2)
     # Draw the epilines
     lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1,1,2), 2, F)
     lines1 = lines1.reshape(-1, 3)
     lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1,1,2),1, F)
     lines2 = lines1.reshape(-1, 3)
     # Store the epilines images
-    img1_epi = drawlines(img1, img2, lines1, pts1, pts2)
-    img2_epi = drawlines(img2, img1, lines2, pts2, pts1)
+    img1_epi = draw_lines(img1, img2, lines1, pts1, pts2)
+    img2_epi = draw_lines(img2, img1, lines2, pts2, pts1)
     cv2.imwrite("result/left_with_epilines.png", img1_epi)
     cv2.imwrite("result/right_with_epilines.png", img2_epi)
-
     # Compute the disparity and store the results
     get_disparity(img1, img2)
