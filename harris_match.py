@@ -21,7 +21,7 @@ def harris_corner(filename):
     # print(dst)
 
     img[dst>0.01*dst.max()]=[0,0,255]
-    posc,posr = dst>0.01*dst.max()
+    # posc,posr = dst>0.01*dst.max()
     # cv2.imshow('dst',img)
     return img
     # if cv2.waitKey(0) & 0xff == 27:
@@ -47,5 +47,5 @@ if __name__ == "__main__":
     # parser.add_argument('input2',default=None, help='Input the second image')
     # args = parser.parse_args()
 
-    cv2.imwrite("Harris_left_corner.jpg",harris_corner("cast-left.jpg"));
-    cv2.imwrite("Harris_right_corner.jpg",harris_corner("cast-right.jpg"));
+    cv2.imwrite("Cones_results/Harris_left_corner.jpg",harris_corner("Cones_im2.jpg"));
+    cv2.imwrite("Cones_results/Harris_right_corner.jpg",harris_corner("Cones_im6.jpg"));
